@@ -1,33 +1,35 @@
 "use client";
-import Image from "next/image";
+
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import {
+  UserMessage,
+  UserMessageSchema,
+} from "@/features/restaurant-finder/schema/userMessage";
+import { generateRestaurantSearchQuery } from "@/features/restaurant-finder/lib/generateRestaurantSearchQuery";
 
 export default function Home() {
-  const getResult = async () => {
-    const response = await fetch("/api/generate", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ key: "value" }), // Replace with your data
-    });
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<UserMessage>({
+    resolver: zodResolver(UserMessageSchema),
+  });
 
-    if (!response.ok) {
-      throw new Error("Network response was not ok");
-    }
-
-    const data = await response.json();
-    console.log(data); // Handle th
-  };
-
-  const handleClick = () => {
-    getResult();
+  const onSubmit = (data: UserMessage) => {
+    generateRestaurantSearchQuery(data);
+    console.log(data);
   };
 
   return (
     <div>
-      <button className="bg-red-500" onClick={() => handleClick()}>
-        sdsd
-      </button>
+      <form onSubmit={handleSubmit(onSubmit)} className="">
+        <input type="text" {...register("query")} className="bg-slate-500" />
+        <button type="submit" className="bg-green-400">
+          Submit
+        </button>
+      </form>
     </div>
   );
 }
