@@ -7,7 +7,7 @@ export const useInfiniteSearchQuery = (searchQuery: UserMessage | null) => {
   return useInfiniteQuery({
     queryKey: ['infiniteQuerySearch', searchQuery],
     queryFn: async ({ pageParam }: { pageParam: PageParam }) => {
-      if (!searchQuery) return null
+      if (!searchQuery) throw new Error('No search query provided')
 
       try {
         return await generateRestaurantSearchQuery({
@@ -22,6 +22,7 @@ export const useInfiniteSearchQuery = (searchQuery: UserMessage | null) => {
     getNextPageParam: (
       lastPage: { params?: OpenAIResponse; nextCursor?: string } | null,
     ) => {
+      if (!lastPage || !lastPage.nextCursor) return undefined
       console.log({
         'this is the nextpage function': lastPage?.params,
         'this is the lastpage object': lastPage,
@@ -34,5 +35,6 @@ export const useInfiniteSearchQuery = (searchQuery: UserMessage | null) => {
     enabled: !!searchQuery,
     initialPageParam: null,
     refetchOnWindowFocus: false,
+    retry: false,
   })
 }
