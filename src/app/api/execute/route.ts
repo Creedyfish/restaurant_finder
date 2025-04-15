@@ -2,30 +2,45 @@ import { NextRequest, NextResponse } from 'next/server'
 import { buildFsqParams } from '@/features/restaurant-finder/lib/buildFsqParams'
 import { generateLLMCommand } from '@/features/restaurant-finder/services/llmService'
 import { searchRestaurants } from '@/features/restaurant-finder/services/foursquareService'
-
+import { RequestSchema } from '@/features/restaurant-finder/schema/pagination'
 export async function POST(req: NextRequest) {
   try {
-    const data = await req.json()
+    const body = await req.json()
+    const parsedData = RequestSchema.safeParse(body)
+
+    if (!parsedData.success) {
+      return NextResponse.json(
+        { error: parsedData.error.flatten() },
+        { status: 400 },
+      )
+    }
 
     //For NextPage --pagination--
-    if (data.params && data.cursor) {
-      const params = buildFsqParams(data.params.parameters)
-      const fsqResponse = await searchRestaurants(params, data.cursor)
+    if (
+      'params' in parsedData.data &&
+      parsedData.data.cursor &&
+      parsedData.data.params
+    ) {
+      const params = buildFsqParams(parsedData.data.params.parameters)
+      const fsqResponse = await searchRestaurants(
+        params,
+        parsedData.data.cursor,
+      )
       return NextResponse.json({
         results: fsqResponse.data.results,
         nextCursor: fsqResponse.nextCursor,
-        params: data.params,
+        params: parsedData.data.params,
       })
     }
 
     //First Fetch Call
 
-    const llmResponse = await generateLLMCommand(data.query)
+    const llmResponse = await generateLLMCommand(parsedData.data.query)
 
     if (llmResponse.action === 'restaurant_search') {
       const params = buildFsqParams(llmResponse.parameters)
 
-      const fsqResponse = await searchRestaurants(params, data.cursor || null)
+      const fsqResponse = await searchRestaurants(params)
 
       return NextResponse.json({
         results: fsqResponse.data.results,
@@ -33,7 +48,16 @@ export async function POST(req: NextRequest) {
         params: llmResponse,
       })
     } else if (llmResponse.action === 'error') {
-      throw new Error('Error user does not query for restaurants')
+      // Return a 400 Bad Request with a helpful message
+      return NextResponse.json(
+        {
+          success: false,
+          error:
+            'This service only handles restaurant-related queries. Please try searching for restaurants, cafes, or dining establishments.',
+          isRestaurantQuery: false,
+        },
+        { status: 400 },
+      )
     } else {
       return NextResponse.json({
         success: false,

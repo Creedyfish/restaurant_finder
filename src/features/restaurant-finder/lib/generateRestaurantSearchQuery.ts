@@ -1,5 +1,5 @@
 import { UserMessage } from '@/features/restaurant-finder/schema/userMessage'
-import { PageParam } from '@/features/restaurant-finder/schema/pagination'
+import { PageParam } from '../schema/pagination'
 interface GenerateRestaurantSearchQueryProps {
   data: UserMessage
   pageParam: PageParam

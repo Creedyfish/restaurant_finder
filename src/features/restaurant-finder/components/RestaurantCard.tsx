@@ -10,7 +10,7 @@ import {
 import { Badge } from '@/components/ui/badge'
 import Image from 'next/image'
 import { Star, Clock, DollarSign, ImageOff } from 'lucide-react'
-import { FsqPlaceResponse } from '../schema/fsqApiResponse'
+import { FsqPlaceResponse, RestaurantCategory } from '../schema/fsqApiResponse'
 
 export default function RestaurantCard({
   restaurant,
@@ -107,8 +107,9 @@ export default function RestaurantCard({
           </div>
           <Badge className="bg-blue-500 hover:bg-blue-600">
             {restaurant.categories.find(
-              (category: any) =>
-                category.short_name.toLowerCase() === keyword.toLowerCase(),
+              (category: RestaurantCategory) =>
+                (category.short_name ?? '').toLowerCase() ===
+                keyword.toLowerCase(),
             )?.short_name ||
               restaurant.categories[0]?.short_name ||
               ''}

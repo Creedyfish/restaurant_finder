@@ -16,7 +16,6 @@ export const PaginationSchema = z.object({
 
 export const InitialFetchSchema = z.object({
   query: z.string(),
-  cursor: z.string().optional(),
 })
 
 export const RequestSchema = z.union([PaginationSchema, InitialFetchSchema])

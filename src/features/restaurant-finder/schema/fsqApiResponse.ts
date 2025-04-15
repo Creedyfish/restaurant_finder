@@ -287,3 +287,4 @@ export const fsqApiResponseSchema = z.object({
 
 export type FsqPlaceResponse = z.infer<typeof fsqPlaceSchema>
 export type FsqApiResponse = z.infer<typeof fsqApiResponseSchema>
+export type RestaurantCategory = z.infer<typeof categorySchema>
