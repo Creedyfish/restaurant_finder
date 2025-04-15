@@ -1,99 +1,110 @@
-import OpenAI from "openai";
-import { OpenAIResponseSchema } from "@/features/restaurant-finder/schema/llmResponse";
+import OpenAI from 'openai'
+import { OpenAIResponseSchema } from '@/features/restaurant-finder/schema/llmResponse'
 
-const OPENROUTER_API_KEY = process.env.OPENROUTER_API_KEY;
+const OPENROUTER_API_KEY = process.env.OPENROUTER_API_KEY
 export const generateLLMCommand = async (query: string) => {
   const openai = new OpenAI({
-    baseURL: "https://openrouter.ai/api/v1",
+    baseURL: 'https://openrouter.ai/api/v1',
     apiKey: OPENROUTER_API_KEY,
-  });
+  })
 
   const completion = await openai.chat.completions.create({
-    model: "openai/gpt-4o-mini",
+    model: 'openai/gpt-4o-mini',
 
     messages: [
       {
-        role: "system",
+        role: 'system',
         content:
-          "You are a restaurant search API that ONLY handles restaurant-related",
+          'You are a restaurant search API that ONLY handles restaurant-related queries',
       },
       {
-        role: "user",
+        role: 'user',
         content: query,
       },
     ],
     response_format: {
-      type: "json_schema",
+      type: 'json_schema',
       json_schema: {
-        name: "restaurant",
+        name: 'restaurant',
         strict: true,
         schema: {
-          type: "object",
+          type: 'object',
           properties: {
             action: {
-              type: "string",
-              enum: ["search", "error"],
+              type: 'string',
+              enum: ['restaurant_search', 'error'],
               description:
-                "action that needs to be taken if the user is looking for a restaurant",
+                'action that needs to be taken if the user is looking for a restaurant',
             },
             parameters: {
-              type: "object",
+              type: 'object',
               properties: {
                 query: {
-                  type: ["string", "null"],
+                  type: ['string', 'null'],
                   description:
                     "Type of Cuisine or type of restaurant being queried. **IMPORTANT** MUST BE THE TYPE OF THE RESTAURANT OR THE CUISINE ITS SERVING AND NOT THE WHOLE QUERY IF NOT THE JUST use the word as the value 'restaurant', And if the user asks for a suggestion answer as best as you can but it should be related to RESTAURANT CUISINES",
                 },
                 name: {
-                  type: ["string", "null"],
+                  type: ['string', 'null'],
                   description:
-                    "The exact name of the restaurant mentioned by the user, if any. Leave null if the user did not specify a restaurant name.",
+                    'The exact name of the restaurant mentioned by the user, if any. Leave null if the user did not specify a restaurant name.',
                 },
                 near: {
-                  type: ["string", "null"],
+                  type: ['string', 'null'],
                   description:
-                    "user-specified location and **IMPORTANT** it must be in GEOCODE FORMAT",
+                    "Extract the **core geographic location** suitable for geocoding. \
+If the location includes descriptors like 'downtown', 'uptown', or 'central', **remove them**. \
+Only return the proper noun part, e.g. 'Chicago', 'Los Angeles', 'New York'. \
+The value must be in GEOCODE FORMAT (e.g. 'Chicago, IL') or a proper noun place name only.",
                 },
                 max_price: {
-                  type: ["integer", "null"],
+                  type: ['integer', 'null'],
 
                   description:
-                    "sets the minimum price the user wants. 1 to 4 (1 = cheapest)",
+                    'sets the minimum price the user wants. 1 to 4 (1 = cheapest). if the user has not mentioned price or any thing related to that then leave at null',
                 },
                 min_price: {
-                  type: ["integer", "null"],
+                  type: ['integer', 'null'],
 
                   description:
-                    "sets the minimum price the user wants. 1 to 4 (1 = cheapest)",
+                    'sets the minimum price the user wants. 1 to 4 (1 = cheapest). if the user has not mentioned price or any thing related to that then leave at null',
                 },
                 open_now: {
-                  type: ["boolean", "null"],
-                  description: "true if user asks if the venue is open or not",
+                  type: ['boolean', 'null'],
+                  description:
+                    'true if user asks if the venue is open or not. return Null when the user is not specific about this.',
+                },
+                sort: {
+                  type: ['string', 'null'],
+                  enum: ['relevance', 'rating', 'distance'],
+                  description:
+                    'Specifies how to sort the results. Use "relevance" (default), "rating", or "distance" to order the venues accordingly.',
                 },
               },
               required: [
-                "query",
-                "near",
-                "min_price",
-                "max_price",
-                "open_now",
-                "name",
+                'query',
+                'near',
+                'min_price',
+                'max_price',
+                'open_now',
+                'name',
+                'sort',
               ],
               additionalProperties: false,
             },
           },
-          required: ["action", "parameters"],
+          required: ['action', 'parameters'],
           additionalProperties: false,
         },
       },
     },
-  });
+  })
 
-  const result = completion.choices[0].message.content;
-  if (!result) throw new Error("Empty LLM response");
+  const result = completion.choices[0].message.content
+  if (!result) throw new Error('Empty LLM response')
 
-  const parsed = OpenAIResponseSchema.safeParse(JSON.parse(result));
-  if (!parsed.success) throw new Error("Invalid LLM response");
+  const parsed = OpenAIResponseSchema.safeParse(JSON.parse(result))
+  if (!parsed.success) throw new Error('Invalid LLM response')
 
-  return parsed.data.parameters;
-};
+  return parsed.data
+}

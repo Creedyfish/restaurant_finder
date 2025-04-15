@@ -1,15 +1,75 @@
-import fsqDevelopers from "@api/fsq-developers";
+const FOURSQUARE_API_KEY = process.env.FOURSQUARE_API_KEY
 
-const FOURSQUARE_API_KEY = process.env.FOURSQUARE_API_KEY;
+export const searchRestaurants = async (
+  params: URLSearchParams,
+  cursor?: string | null,
+) => {
+  const searchParams = new URLSearchParams()
 
-export const searchRestaurants = async (params: URLSearchParams) => {
-  fsqDevelopers.auth(FOURSQUARE_API_KEY!);
-  const response = await fsqDevelopers.placeSearch({
-    query: params.get("query") ?? undefined,
-    fields: "hours%2Crating%2Cprice%2Cname%2Clocation%2Ccategories",
-    near: params.get("near") ?? undefined,
-    limit: 2,
-  });
+  if (params.get('name') || params.get('query')) {
+    searchParams.append(
+      'query',
+      params.get('name') || params.get('query') || '',
+    )
+  }
 
-  return response;
-};
+  searchParams.append(
+    'fields',
+    'hours,rating,price,name,location,categories,photos',
+  )
+
+  if (params.get('near')) {
+    searchParams.append('near', params.get('near') || '')
+  }
+
+  searchParams.append('limit', '10')
+
+  if (params.get('min_price')) {
+    searchParams.append('min_price', params.get('min_price') || '')
+  }
+
+  if (params.get('max_price')) {
+    searchParams.append('max_price', params.get('max_price') || '')
+  }
+
+  if (params.get('sort')) {
+    searchParams.append('sort', params.get('sort') || '')
+  }
+
+  if (params.get('open_now')) {
+    searchParams.append('open_now', params.get('open_now') || '')
+  }
+
+  if (cursor) {
+    searchParams.append('cursor', cursor)
+  }
+
+  const url = `https://api.foursquare.com/v3/places/search?${searchParams.toString()}`
+
+  const response = await fetch(url, {
+    method: 'GET',
+    headers: {
+      Authorization: FOURSQUARE_API_KEY!,
+      Accept: 'application/json',
+    },
+  })
+
+  if (!response.ok) {
+    throw new Error(
+      `Foursquare API error: ${response.status} ${response.statusText}`,
+    )
+  }
+
+  let nextCursor = null
+  const linkHeader = response.headers.get('link')
+
+  if (linkHeader) {
+    const match = linkHeader.match(/cursor=([^&>]+)/)
+
+    nextCursor = match ? match[1] : null
+  }
+
+  const data = await response.json()
+
+  return { data, nextCursor }
+}
