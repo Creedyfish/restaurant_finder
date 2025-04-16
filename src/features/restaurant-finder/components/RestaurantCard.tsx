@@ -134,18 +134,28 @@ export default function RestaurantCard({
         </div>
       </CardContent>
 
-      <CardFooter className="flex items-center justify-center border-t pt-4">
-        <Clock className="mr-2 h-4 w-4 text-gray-500" />
-        <div className="flex flex-col justify-center text-sm text-gray-700">
-          {restaurant.hours?.display ? (
-            restaurant.hours.display.split(';').map((dayHours, index) => (
-              <p key={index} className="mb-1">
-                {dayHours.trim()}
+      <CardFooter className="border-t pt-4">
+        <div className="flex w-full flex-col space-y-2">
+          <div className="flex items-center">
+            <Clock className="mr-2 h-4 w-4 text-blue-500" />
+            <span className="font-medium text-gray-700">Operating Hours</span>
+          </div>
+
+          <div className="mt-1 ml-6 rounded-md bg-gray-50 p-2">
+            {restaurant.hours?.display ? (
+              <div className="grid grid-cols-1 gap-1.5">
+                {restaurant.hours.display.split(';').map((dayHours, index) => (
+                  <p key={index} className="text-sm text-gray-600">
+                    {dayHours.trim()}
+                  </p>
+                ))}
+              </div>
+            ) : (
+              <p className="text-sm text-gray-500 italic">
+                Hours not available
               </p>
-            ))
-          ) : (
-            <p>Hours not available</p>
-          )}
+            )}
+          </div>
         </div>
       </CardFooter>
     </Card>

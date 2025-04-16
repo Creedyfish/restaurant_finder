@@ -48,7 +48,6 @@ export async function POST(req: NextRequest) {
         params: llmResponse,
       })
     } else if (llmResponse.action === 'error') {
-      // Return a 400 Bad Request with a helpful message
       return NextResponse.json(
         {
           success: false,

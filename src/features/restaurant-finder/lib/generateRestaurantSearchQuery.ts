@@ -20,11 +20,16 @@ export const generateRestaurantSearchQuery = async ({
       params: pageParam?.params ?? null,
     }),
   })
+  const responseData = await response.json()
 
   if (!response.ok) {
-    throw new Error('Network response was not ok')
+    const error = new Error(responseData.error || 'An error occurred')
+
+    if (responseData.isRestaurantQuery === false) {
+      error.name = 'NonRestaurantQueryError'
+    }
+    throw error
   }
-  const responseData = await response.json()
 
   return {
     results: responseData.results,

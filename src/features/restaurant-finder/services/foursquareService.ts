@@ -1,3 +1,5 @@
+import { fsqApiResponseSchema } from '../schema/fsqApiResponse'
+
 const FOURSQUARE_API_KEY = process.env.FOURSQUARE_API_KEY
 
 export const searchRestaurants = async (
@@ -15,7 +17,7 @@ export const searchRestaurants = async (
 
   searchParams.append(
     'fields',
-    'hours,rating,price,name,location,categories,photos',
+    'fsq_id,hours,rating,price,name,location,categories,photos',
   )
 
   if (params.get('near')) {
@@ -69,7 +71,15 @@ export const searchRestaurants = async (
     nextCursor = match ? match[1] : null
   }
 
-  const data = await response.json()
+  const responseData = await response.json()
 
-  return { data, nextCursor }
+  const parsedData = fsqApiResponseSchema.safeParse(responseData)
+
+  if (!parsedData.success) {
+    throw new Error(
+      "We couldn't retrieve restaurant information at this time. Please try again later.",
+    )
+  }
+
+  return { data: parsedData.data, nextCursor }
 }

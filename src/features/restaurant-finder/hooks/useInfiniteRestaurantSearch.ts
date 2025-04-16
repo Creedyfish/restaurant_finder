@@ -19,19 +19,18 @@ export const useInfiniteSearchQuery = (searchQuery: UserMessage | null) => {
         throw error
       }
     },
+
     getNextPageParam: (
       lastPage: { params?: OpenAIResponse; nextCursor?: string } | null,
     ) => {
       if (!lastPage || !lastPage.nextCursor) return undefined
-      console.log({
-        'this is the nextpage function': lastPage?.params,
-        'this is the lastpage object': lastPage,
-      })
+
       return {
         nextCursor: lastPage?.nextCursor || undefined,
         params: lastPage?.params,
       }
     },
+
     enabled: !!searchQuery,
     initialPageParam: null,
     refetchOnWindowFocus: false,

@@ -12,8 +12,8 @@ import RestaurantCard from '@/features/restaurant-finder/components/RestaurantCa
 import { Input } from '@/components/ui/input'
 import { useInfiniteSearchQuery } from '@/features/restaurant-finder/hooks/useInfiniteRestaurantSearch'
 import { FsqPlaceResponse } from '@/features/restaurant-finder/schema/fsqApiResponse'
-import { Search, Loader2 } from 'lucide-react'
-
+import { Search, Loader2, AlertCircle } from 'lucide-react'
+import { Alert, AlertDescription } from '@/components/ui/alert'
 export default function Home() {
   const [searchQuery, setSearchQuery] = useState<UserMessage | null>(null)
 
@@ -25,8 +25,14 @@ export default function Home() {
     resolver: zodResolver(UserMessageSchema),
   })
 
-  const { data, fetchNextPage, hasNextPage, isFetchingNextPage, isFetching } =
-    useInfiniteSearchQuery(searchQuery)
+  const {
+    data,
+    fetchNextPage,
+    hasNextPage,
+    isFetchingNextPage,
+    isFetching,
+    error,
+  } = useInfiniteSearchQuery(searchQuery)
 
   const onSubmit = (formData: UserMessage) => {
     setSearchQuery(formData)
@@ -79,6 +85,17 @@ export default function Home() {
           </div>
         )}
       </form>
+
+      {error && (
+        <Alert variant="destructive" className="mx-auto w-full max-w-2xl">
+          <AlertCircle className="h-4 w-4" />
+          <AlertDescription>
+            {error instanceof Error
+              ? error.message
+              : 'An error occurred. Please try again.'}
+          </AlertDescription>
+        </Alert>
+      )}
 
       {data && (
         <div className="space-y-6">
