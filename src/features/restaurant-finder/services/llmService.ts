@@ -2,7 +2,23 @@ import OpenAI from 'openai'
 import { OpenAIResponseSchema } from '@/features/restaurant-finder/schema/llmResponse'
 import { handleOpenAIError } from '@/features/restaurant-finder/lib/errors/openAIErrors'
 
+/**
+ * Generates a command using OpenAI's GPT model to process restaurant-related queries.
+ *
+ * This function sends a query to the OpenAI API and expects a structured response in JSON schema format.
+ * The response includes an action (`restaurant_search` or `error`) and parameters for the restaurant search.
+ *
+ * @param {string} query - The user query to process, such as "Find sushi restaurants in New York."
+ *
+ * @returns {Promise<OpenAIResponse>} The parsed response from the OpenAI API, including the action and parameters.
+ *
+ * @throws {Error} Throws an error if the API request fails, the response is invalid, or the OpenAI API returns an error.
+ * - If the API request fails, the error is handled by `handleOpenAIError`.
+ * - If the response is empty or cannot be parsed, a generic error is thrown.
+ */
+
 const OPENROUTER_API_KEY = process.env.OPENROUTER_API_KEY
+
 export const generateLLMCommand = async (query: string) => {
   const openai = new OpenAI({
     baseURL: 'https://openrouter.ai/api/v1',

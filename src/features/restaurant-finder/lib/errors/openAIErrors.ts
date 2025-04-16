@@ -1,7 +1,27 @@
 import OpenAI from 'openai'
 
+/**
+ * Handles errors returned by the OpenAI API or SDK.
+ *
+ * This function processes errors from the OpenAI API and provides meaningful error messages
+ * for debugging and user-facing error handling. It categorizes errors based on their type
+ * (e.g., API errors, SDK errors, or unexpected errors) and logs them to the backend console.
+ *
+ * @param {any} error - The error object returned by the OpenAI API or SDK.
+ *
+ * @throws {Error} Throws a generic error with a user-friendly message if the error cannot be resolved.
+ * - If the error is an `OpenAI.APIError`, it logs the error status and message based on predefined error codes.
+ * - If the error is an instance of `Error`, it logs the SDK error message.
+ * - For unexpected errors, it logs the raw error object.
+ * * ## Backend Logs:
+ * - Logs detailed error messages to the backend console for debugging purposes.
+ * - Example log for a 401 error:
+ *   ```
+ *   OpenAI API Error: Authentication failed. Please check your API key - Invalid API key
+ *   ``
+ */
+
 export function handleOpenAIError(error: any) {
-  // Define error messages for different status codes
   const errorMessages: Record<number, string> = {
     400: 'Invalid request parameters',
     401: 'Authentication failed. Please check your API key',

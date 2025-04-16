@@ -1,5 +1,23 @@
 import { OpenAIResponse } from '@/features/restaurant-finder/schema/llmResponse'
 
+/**
+ * Builds Foursquare API query parameters from the parsed OpenAI response.
+ *
+ * This function takes the `parameters` object from the OpenAI response and converts it into
+ * a `URLSearchParams` object that can be used to make requests to the Foursquare API.
+ *
+ * @param {OpenAIResponse['parameters']} parsed - The parsed parameters from the OpenAI response.
+ * - `query` (string | null): The type of cuisine or restaurant being queried.
+ * - `name` (string | null): The exact name of the restaurant, if specified.
+ * - `near` (string | null): The geographic location for the search.
+ * - `min_price` (number | null): The minimum price level (1 to 4).
+ * - `max_price` (number | null): The maximum price level (1 to 4).
+ * - `open_now` (boolean | null): Whether to filter for restaurants that are currently open.
+ * - `sort` (string | null): The sorting criteria (`relevance`, `rating`, or `distance`).
+ *
+ * @returns {URLSearchParams} A `URLSearchParams` object containing the query parameters for the Foursquare API.
+ */
+
 export function buildFsqParams(parsed: OpenAIResponse['parameters']) {
   const params = new URLSearchParams()
 

@@ -12,6 +12,45 @@ import Image from 'next/image'
 import { Star, Clock, DollarSign, ImageOff } from 'lucide-react'
 import { FsqPlaceResponse, RestaurantCategory } from '../schema/fsqApiResponse'
 
+/**
+ * A React component that displays detailed information about a restaurant.
+ *
+ * This card includes the restaurant's name, address, category, rating, price level, operating hours,
+ * and an image (if available). It also indicates whether the restaurant is currently open or closed.
+ *
+ * @component
+ * @param {Object} props - The properties passed to the component.
+ * @param {FsqPlaceResponse} props.restaurant - The restaurant data to display.
+ * @param {string} props.keyword - The keyword used to highlight matching categories.
+ *
+ * @returns {JSX.Element} A styled card displaying restaurant details.
+ *
+ * ## Features:
+ * - Displays the restaurant's name, address, and category.
+ * - Shows the restaurant's rating as stars (out of 5) and a numeric score (out of 10).
+ * - Displays the price level as dollar signs (`$`).
+ * - Indicates whether the restaurant is currently open or closed.
+ * - Shows the restaurant's operating hours in a readable format.
+ * - Displays an image of the restaurant or a fallback message if no image is available.
+ *
+ * ## Example Usage:
+ * ```tsx
+ * import RestaurantCard from '@/features/restaurant-finder/components/RestaurantCard';
+ *
+ * const restaurant = {
+ *   name: 'Sushi Place',
+ *   location: { address: '123 Main St', locality: 'New York' },
+ *   categories: [{ short_name: 'Sushi' }],
+ *   rating: 8.5,
+ *   price: 3,
+ *   hours: { open_now: true, display: 'Mon-Fri 9:00 AM-9:00 PM; Sat 10:00 AM-8:00 PM' },
+ *   photos: [{ prefix: 'https://example.com/', suffix: 'photo.jpg' }],
+ * };
+ *
+ * <RestaurantCard restaurant={restaurant} keyword="Sushi" />;
+ * ```
+ */
+
 export default function RestaurantCard({
   restaurant,
   keyword,
