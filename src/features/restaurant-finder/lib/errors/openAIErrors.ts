@@ -21,7 +21,7 @@ import OpenAI from 'openai'
  *   ``
  */
 
-export function handleOpenAIError(error: any) {
+export function handleOpenAIError(error: unknown) {
   const errorMessages: Record<number, string> = {
     400: 'Invalid request parameters',
     401: 'Authentication failed. Please check your API key',

@@ -32,47 +32,11 @@ export const searchRestaurants = async (
   params: URLSearchParams,
   cursor?: string | null,
 ) => {
-  const searchParams = new URLSearchParams()
-
-  if (params.get('name') || params.get('query')) {
-    searchParams.append(
-      'query',
-      params.get('name') || params.get('query') || '',
-    )
-  }
-
-  searchParams.append(
-    'fields',
-    'fsq_id,hours,rating,price,name,location,categories,photos',
-  )
-
-  if (params.get('near')) {
-    searchParams.append('near', params.get('near') || '')
-  }
-
-  searchParams.append('limit', '10')
-
-  if (params.get('min_price')) {
-    searchParams.append('min_price', params.get('min_price') || '')
-  }
-
-  if (params.get('max_price')) {
-    searchParams.append('max_price', params.get('max_price') || '')
-  }
-
-  if (params.get('sort')) {
-    searchParams.append('sort', params.get('sort') || '')
-  }
-
-  if (params.get('open_now')) {
-    searchParams.append('open_now', params.get('open_now') || '')
-  }
-
   if (cursor) {
-    searchParams.append('cursor', cursor)
+    params.append('cursor', cursor)
   }
 
-  const url = `https://api.foursquare.com/v3/places/search?${searchParams.toString()}`
+  const url = `https://api.foursquare.com/v3/places/search?${params.toString()}`
 
   const response = await fetch(url, {
     method: 'GET',

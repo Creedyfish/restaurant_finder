@@ -94,6 +94,13 @@ export const generateLLMCommand = async (query: string) => {
                     description:
                       'Specifies how to sort the results. Use "relevance" (default), "rating", or "distance" to order the venues accordingly.',
                   },
+                  open_at: {
+                    type: ['string', 'null'],
+                    description:
+                      'Support local day and local time requests. Format is DOWTHHMM (e.g., 1T2130 = Monday 9:30PM). ' +
+                      'DOW is day number (1 = Monday, 7 = Sunday). Time is 24-hour. Cannot be used with open_now. ' +
+                      'If user asks about future times like "open tonight at 8pm", convert it to correct DOWTHHMM format.',
+                  },
                 },
                 required: [
                   'query',
@@ -103,6 +110,7 @@ export const generateLLMCommand = async (query: string) => {
                   'open_now',
                   'name',
                   'sort',
+                  'open_at',
                 ],
                 additionalProperties: false,
               },

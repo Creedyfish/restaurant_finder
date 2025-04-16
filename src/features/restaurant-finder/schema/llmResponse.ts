@@ -10,6 +10,13 @@ export const OpenAIResponseSchema = z.object({
     min_price: z.number().int().min(1).max(4).nullable(),
     open_now: z.boolean().nullable(),
     sort: z.enum(['relevance', 'rating', 'distance']),
+    open_at: z
+      .string()
+      .regex(/^[1-7]T[0-2][0-9][0-5][0-9]$/, {
+        message:
+          'Invalid format for open_at. Use DOWTHHMM, e.g., 1T2130 (Monday, 9:30PM)',
+      })
+      .nullable(),
   }),
 })
 
