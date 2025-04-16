@@ -1,5 +1,5 @@
 import { fsqApiResponseSchema } from '../schema/fsqApiResponse'
-
+import { handleFoursquareError } from '../lib/errors/foursquareError'
 const FOURSQUARE_API_KEY = process.env.FOURSQUARE_API_KEY
 
 export const searchRestaurants = async (
@@ -57,9 +57,7 @@ export const searchRestaurants = async (
   })
 
   if (!response.ok) {
-    throw new Error(
-      `Foursquare API error: ${response.status} ${response.statusText}`,
-    )
+    handleFoursquareError(response)
   }
 
   let nextCursor = null
@@ -76,6 +74,10 @@ export const searchRestaurants = async (
   const parsedData = fsqApiResponseSchema.safeParse(responseData)
 
   if (!parsedData.success) {
+    console.error(
+      'Foursquare API response validation failed:',
+      parsedData.error,
+    )
     throw new Error(
       "We couldn't retrieve restaurant information at this time. Please try again later.",
     )
