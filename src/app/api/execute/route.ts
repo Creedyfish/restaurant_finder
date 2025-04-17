@@ -94,6 +94,7 @@ export async function POST(req: NextRequest) {
     try {
       await rateLimiter.consume(ip)
     } catch (rateLimitError) {
+      console.error(rateLimitError)
       return NextResponse.json(
         { error: 'Too many requests, please try again later.' },
         { status: 429 },
