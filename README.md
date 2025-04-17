@@ -69,7 +69,7 @@ git clone https://github.com/Creedyfish/restaurant_finder.git
 Go to the project directory
 
 ```bash
-  cd restaurant-finder
+  cd restaurant_finder
 ```
 
 Install dependencies
