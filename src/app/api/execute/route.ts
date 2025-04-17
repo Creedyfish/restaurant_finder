@@ -3,6 +3,7 @@ import { buildFsqParams } from '@/features/restaurant-finder/lib/buildFsqParams'
 import { generateLLMCommand } from '@/features/restaurant-finder/services/llmService'
 import { searchRestaurants } from '@/features/restaurant-finder/services/foursquareService'
 import { RequestSchema } from '@/features/restaurant-finder/schema/pagination'
+import { rateLimiter } from '@/lib/rateLimiter'
 
 /**
  * Handles POST requests for restaurant search functionality.
@@ -88,6 +89,17 @@ import { RequestSchema } from '@/features/restaurant-finder/schema/pagination'
 
 export async function POST(req: NextRequest) {
   try {
+    const ip = req.headers.get('x-forwarded-for') || 'anonymous'
+
+    try {
+      await rateLimiter.consume(ip)
+    } catch (rateLimitError) {
+      return NextResponse.json(
+        { error: 'Too many requests, please try again later.' },
+        { status: 429 },
+      )
+    }
+
     const body = await req.json()
     const parsedData = RequestSchema.safeParse(body)
 

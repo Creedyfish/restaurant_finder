@@ -1,4 +1,5 @@
-import React from 'react'
+'use client'
+import { useState } from 'react'
 import {
   Card,
   CardContent,
@@ -11,7 +12,7 @@ import { Badge } from '@/components/ui/badge'
 import Image from 'next/image'
 import { Star, Clock, DollarSign, ImageOff } from 'lucide-react'
 import { FsqPlaceResponse, RestaurantCategory } from '../schema/fsqApiResponse'
-
+import { Skeleton } from '@/components/ui/skeleton'
 /**
  * A React component that displays detailed information about a restaurant.
  *
@@ -58,6 +59,8 @@ export default function RestaurantCard({
   restaurant: FsqPlaceResponse
   keyword: string
 }) {
+  const [imageLoading, setImageLoading] = useState(true)
+
   const renderPriceLevel = (level: number) => {
     const dollars = []
     for (let i = 0; i < level; i++) {
@@ -109,20 +112,28 @@ export default function RestaurantCard({
 
   return (
     <Card className="group w-full max-w-sm overflow-hidden shadow-lg">
-      <div className="relative h-48 w-full overflow-hidden">
+      <div className="relative h-48 w-full overflow-hidden bg-gray-100">
+        {imageLoading && restaurantImage && (
+          <Skeleton className="absolute inset-0 h-full w-full" />
+        )}
+
         {restaurantImage ? (
           <Image
             src={restaurantImage}
             alt={restaurant.name}
             fill
-            className="object-cover transition-transform duration-300 group-hover:scale-110"
+            className={`object-cover transition-transform duration-300 group-hover:scale-110 ${
+              imageLoading ? 'opacity-0' : 'opacity-100'
+            }`}
             sizes="(max-width: 768px) 100vw, 400px"
             priority={false}
+            onLoadingComplete={() => setImageLoading(false)}
+            onError={() => setImageLoading(false)}
           />
         ) : (
           <div className="flex h-full w-full flex-col items-center justify-center bg-gray-200 text-gray-500">
-            <ImageOff />
-            No Image Found
+            <ImageOff className="mb-2" />
+            <span className="text-sm">No Image Found</span>
           </div>
         )}
         <div className="absolute top-2 right-2">
